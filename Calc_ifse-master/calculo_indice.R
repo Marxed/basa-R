@@ -7,6 +7,7 @@
 ##############1ªParte################tabelas##############################################
 #carregar tabela (data set)                                                                         #
 tabela_completa = read.csv2('tabela_ifse.csv', header = TRUE, sep = ';', dec = ',')  
+
 qtd_linhas <- nrow(tabela_completa) #qtd de linhas do arquivo .csv
 qtd_colunas <- ncol(tabela_completa) #qtd de coluanas 
 #criar tabela de 0's para posteriormente colocar o index. 
@@ -16,7 +17,7 @@ tabela_ranqueada_dor = matrix(0, qtd_linhas, qtd_colunas)
 tabela_ranqueada_biomr = matrix(0, qtd_linhas, qtd_colunas)
 tabela_ranqueada_vcmr = matrix(0, qtd_linhas, qtd_colunas)
 tabela_ranqueada_usor = matrix(0, qtd_linhas, qtd_colunas)
-tabela_dummy = matrix(0,qtd_linhas,6) #tabela para colocar as colunas com as variáveis dummy
+tabela_dummy = matrix(0,qtd_linhas,1) #tabela para colocar as colunas com as variáveis dummy
 #ordena todas as colunas a partir da coluna abr
 index_abr<- with(tabela_completa, order(abr,fqr, dor, vcmr, biomr, usor, decreasing = TRUE))
 tabela_ranqueada_abr =  tabela_completa[index_abr,]   
@@ -44,6 +45,9 @@ t_biomassa_especies <- 26377324.25  #biomassa de todas as especies
 valor_total_comercial_madeira <- 415148.77 #vcmr total em R$ Obs: esse valor esta na tabela do spss(tabelão)
 t_uso_especie <- 203 #usor da especie
 ############dummy#############
+#Tabela que irá armazenar as variaveis e suas respectivas variaveis dummys.
+tabela_completaD = matrix(0,qtd_linhas,12)
+
 #abr#
 for (i in qtd_linhas) {
   
@@ -65,6 +69,14 @@ for (a in 1:qtd_linhas) {
     x[a,1] <- 1 #escrever variávei dummy na matriz
   }
 }
+index_F = index_abr;
+tabela_apoio = matrix(0, qtd_linhas,2)
+tabela_apoio[,1] = index_abr
+tabela_apoio[,2] = x
+source("colDummy.R")
+tabela_completaD[,1] = tabela_completa[,4]
+tabela_completaD[,2] = tabela_dummy
+
 
 #fqr#
 #pegar o numero de parcelas por especie
@@ -86,6 +98,13 @@ for(fq in 1:qtd_linhas){
   }
 }
 
+index_F = index_fqr;
+tabela_apoio[,1] = index_F
+tabela_apoio[,2] = x_fqr
+source("colDummy.R")
+tabela_completaD[,3] = tabela_completa[,5]
+tabela_completaD[,4] = tabela_dummy
+
 #Area Basal ABr =  dor na tabela
 for(dr in 1:qtd_linhas){
   
@@ -105,6 +124,14 @@ for (area in 1:qtd_linhas) {
   }
   
 }
+
+index_F = index_dor;
+tabela_apoio[,1] = index_F
+tabela_apoio[,2] = x_area
+source("colDummy.R")
+tabela_completaD[,5] = tabela_completa[,6]
+tabela_completaD[,6] = tabela_dummy
+
 #Valor comercial da madeira (vcmr)
 for (vc in 1:qtd_linhas) {
   valor_comercial_madeira_especie <- ((tabela_ranqueada_vcmr$vcmr/100) * valor_total_comercial_madeira)
@@ -122,6 +149,13 @@ for (vcm in 1:qtd_linhas) {
   }
 }
 
+index_F = index_vcmr;
+tabela_apoio[,1] = index_F
+tabela_apoio[,2] = x_vcmr
+source("colDummy.R")
+tabela_completaD[,7] = tabela_completa[,7]
+tabela_completaD[,8] = tabela_dummy
+
 #biomassa
 for (bio in 1:qtd_linhas) {
   biomassa_especie <- ((tabela_ranqueada_biomr$biomr/100) * t_biomassa_especies)
@@ -138,6 +172,12 @@ for(biom in 1:qtd_linhas){
     x_bio[biom,1] <- 1
   }
 }
+index_F = index_biomr;
+tabela_apoio[,1] = index_F
+tabela_apoio[,2] = x_bio
+source("colDummy.R")
+tabela_completaD[,9] = tabela_completa[,8]
+tabela_completaD[,10] = tabela_dummy
  #PFNM
  for (pf in 1:qtd_linhas) {
    pfmn_especie <- ((tabela_ranqueada_usor$usor/100) * t_uso_especie)
@@ -156,3 +196,9 @@ for(biom in 1:qtd_linhas){
      
    }
  }
+ index_F = index_usor
+ tabela_apoio[,1] = index_F
+ tabela_apoio[,2] = x_pfnmr
+ source("colDummy.R")
+ tabela_completaD[,11] = tabela_completa[,9]
+ tabela_completaD[,12] = tabela_dummy
